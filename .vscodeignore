@@ -1,0 +1,13 @@
+.vscode/**
+build/**
+node_modules/**
+webviews/**
+src/**
+.gitignore
+.yarnrc
+**/*.vsix
+**/rollup.config.js 
+**/tsconfig.json
+**/.eslintrc.json
+**/*.map
+**/*.ts
