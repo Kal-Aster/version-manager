@@ -4,5 +4,8 @@ All notable changes to the "version-manager" extension will be documented in thi
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.0.2] - 21/11/2021
+- Fix multiple line entry wrap
+
 ## [0.0.1] - 21/11/2021
 - Initial release
