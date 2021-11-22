@@ -2,7 +2,13 @@
 
 All notable changes to the "version-manager" extension will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## [0.1.2] - 22/11/2021
+- Ask confirm when deleting entry
+- Edit CHANGELOG description
+- Remove duplicate title
+- Edit new version buttons showing current version
+- Fix webview state after new version
+- Edit add change button
 
 ## [0.0.2] - 21/11/2021
 - Fix multiple line entry wrap

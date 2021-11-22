@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import getChanges from "./getChanges";
 
 import getNonce from "./getNonce";
+import getVersion from "./getVersion";
 import NEW_VERSION_TYPE from "./NEW_VERSION_TYPE";
 import removeChange from "./removeChange";
 import setChange from "./setChange";
@@ -27,22 +28,29 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
         webviewView.webview.onDidReceiveMessage(async (data) => {
             switch (data.type) {
-                case "stage-new-major-version": {
-                    stageNewVersion(NEW_VERSION_TYPE.MAJOR);
-                    break;
-                }
-                case "stage-new-minor-version": {
-                    stageNewVersion(NEW_VERSION_TYPE.MINOR);
-                    break;
-                }
+                case "stage-new-major-version":
+                case "stage-new-minor-version":
                 case "stage-new-patch-version": {
-                    stageNewVersion(NEW_VERSION_TYPE.PATCH);
-                    break;
+                    if (getChanges(true).length === 0) {
+                        vscode.window.showInformationMessage(
+                            "Flag at least one change to create a new version"
+                        );
+                        break;
+                    }
+                    stageNewVersion(({
+                        "stage-new-major-version": NEW_VERSION_TYPE.MAJOR,
+                        "stage-new-minor-version": NEW_VERSION_TYPE.MINOR,
+                        "stage-new-patch-version": NEW_VERSION_TYPE.PATCH
+                    } as any)[data.type]);
                 }
-                case "get-changes": {
+                case "get-info": {
                     webviewView.webview.postMessage({
                         type: "changes",
                         value: getChanges()
+                    });
+                    webviewView.webview.postMessage({
+                        type: "version",
+                        value: getVersion()
                     });
                     break;
                 }
@@ -55,6 +63,12 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                     break;
                 }
                 case "rem-change": {
+                    if ((await vscode.window.showInformationMessage(
+                        `Want to delete this change? (${data.value})`,
+                        "Yes", "No"
+                    )) === "No") {
+                        break;
+                    }
                     removeChange(data.value);
                     webviewView.webview.postMessage({
                         type: "changes",

@@ -5,20 +5,31 @@
         description: string,
         done: boolean
     }[] = [];
-    let loading: boolean = true;
+    let version: {
+        major: number,
+        minor: number,
+        patch: number
+    };
+    let changesLoading: boolean = true;
+    let versionLoading: boolean = true;
     
     onMount(async () => {
         window.addEventListener("message", async (event) => {
             const message = event.data;
             switch (message.type) {
                 case "changes": {
-                    loading = false;
+                    changesLoading = false;
                     changes = message.value;
+                    break;
+                }
+                case "version": {
+                    versionLoading = false;
+                    version = message.value;
                     break;
                 }
             }
         });
-        vscode.postMessage({ type: "get-changes", value: undefined });
+        vscode.postMessage({ type: "get-info", value: undefined });
     });
 
     function setChange(description: string, done: boolean) {
@@ -44,11 +55,27 @@
     }
 </script>
 
-<div style="font-weight: bold; font-size: 11px;">VERSION MANAGER</div>
-
-{#if loading}
+{#if changesLoading || versionLoading}
     <div>Loading...</div>
 {:else}
+    <div style="display: flex; align-items: center; margin-bottom: 24px;">
+        <div style="margin-right: 8px;">Version:</div>
+        <button on:click={() => {
+            vscode.postMessage({ type: "stage-new-major-version", value: "" });
+        }}>{ version.major + (
+            changes.filter(change => change.done).length > 0 ? "↑" : ""
+        ) }</button>
+        <button on:click={() => {
+            vscode.postMessage({ type: "stage-new-minor-version", value: "" });
+        }}>{ version.minor + (
+            changes.filter(change => change.done).length > 0 ? "↑" : ""
+        ) }</button>
+        <button on:click={() => {
+            vscode.postMessage({ type: "stage-new-patch-version", value: "" });
+        }}>{ version.patch + (
+            changes.filter(change => change.done).length > 0 ? "↑" : ""
+        ) }</button>
+    </div>
     {#each changes as change}
         <div style="display: flex; align-items: center;">
             <label style="display: flex; flex-grow: 1;">
@@ -68,24 +95,14 @@
             >✕</div>
         </div>
     {/each}
-    <form on:submit={submitChange} style="margin: 24px 0 48px;">
-        <div  style="display: flex; align-items: center;">
-            <input name="done" type="checkbox">
-            <input name="description" type="text">
-        </div>
-        <button>Add</button>
+    <form
+        on:submit={submitChange}
+        style="margin: 24px 0 48px; display: flex; align-items: center;"
+    >
+        <input name="done" type="checkbox">
+        <input name="description" type="text">
+        <button
+            style="padding: var(--input-padding-vertical); width: auto; margin-left: 8px;"
+        >Add</button>
     </form>
-{/if}
-{#if changes.filter(change => change.done).length > 0}
-    <button on:click={() => {
-        vscode.postMessage({ type: "stage-new-major-version", value: "" });
-    }}>New major version</button>
-    <button on:click={() => {
-        vscode.postMessage({ type: "stage-new-minor-version", value: "" });
-    }}>New minor version</button>
-    <button on:click={() => {
-        vscode.postMessage({ type: "stage-new-patch-version", value: "" });
-    }}>New patch version</button>
-{:else}
-    <div>Flag at least one change as done to create a new version</div>
 {/if}
