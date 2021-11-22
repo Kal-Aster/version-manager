@@ -55,10 +55,17 @@
     }
 </script>
 
+<style>
+    input[type="checkbox"] {
+        margin-left: 0;
+        margin-right: 8px;
+    }
+</style>
+
 {#if changesLoading || versionLoading}
     <div>Loading...</div>
 {:else}
-    <div style="display: flex; align-items: center; margin-bottom: 24px;">
+    <div style="display: flex; align-items: center;">
         <div style="margin-right: 8px;">Version:</div>
         <button on:click={() => {
             vscode.postMessage({ type: "stage-new-major-version", value: "" });
@@ -76,6 +83,25 @@
             changes.filter(change => change.done).length > 0 ? "↑" : ""
         ) }</button>
     </div>
+    <form
+        on:submit={submitChange}
+        style="margin: 12px 0 24px; display: flex; align-items: center;"
+    >
+        <input name="done" type="checkbox">
+        <input name="description" type="text"
+            style="
+                box-sizing: content-box;
+                height: 1.25em;
+            "
+        >
+        <button
+            style="
+                padding: var(--input-padding-vertical);
+                width: auto; margin-left: 8px;
+                line-height: 1.25;
+            "
+        >Add</button>
+    </form>
     {#each changes as change}
         <div style="display: flex; align-items: center;">
             <label style="display: flex; flex-grow: 1;">
@@ -95,14 +121,4 @@
             >✕</div>
         </div>
     {/each}
-    <form
-        on:submit={submitChange}
-        style="margin: 24px 0 48px; display: flex; align-items: center;"
-    >
-        <input name="done" type="checkbox">
-        <input name="description" type="text">
-        <button
-            style="padding: var(--input-padding-vertical); width: auto; margin-left: 8px;"
-        >Add</button>
-    </form>
 {/if}

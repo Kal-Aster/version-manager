@@ -1,16 +1,29 @@
-import { existsSync, readFileSync } from "fs";
-import getFSPath from "./getFSPath";
+import { readFileSync } from "fs";
+import getChangeLogPath from "./getChangeLogPath";
 
 const allRegex = /^\[[ x]\](.*)$/gm;
 const doneRegex = /^\[[x]\](.*)$/gm;
 
 export default function getChanges(done: boolean = false) {
-    const path = getFSPath("ROADMAP.md");
-    if (!path || !existsSync(path)) {
+    const path = getChangeLogPath();
+    if (!path) {
         return [];
     }
     const content = readFileSync(path).toString();
-    const match = content.match(done ? doneRegex : allRegex);
+    const unreleasedStartIndex = (
+        content.match(/\r?\n##\s+\[unreleased\]/i)?.index! ?? -1
+    );
+    if (unreleasedStartIndex === -1) {
+        return [];
+    }
+    const unreleasedEndIndex = (
+        content.match(/\r?\n##\s+\[(\d+).(\d+).(\d+)\]/)?.index ||
+        content.length - 1
+    );
+    const match = content.substr(
+        unreleasedStartIndex,
+        unreleasedEndIndex - unreleasedStartIndex
+    ).match(done ? doneRegex : allRegex);
     if (!match) {
         return [];
     }

@@ -2,6 +2,10 @@
 
 All notable changes to the "version-manager" extension will be documented in this file.
 
+## [0.2.2] - 22/11/2021
+- Move add change input on top
+- Use "Unreleased" version in CHANGELOG instead ROADMAP file
+
 ## [0.1.2] - 22/11/2021
 - Ask confirm when deleting entry
 - Edit CHANGELOG description

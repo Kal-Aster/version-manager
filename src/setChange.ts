@@ -1,27 +1,51 @@
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import escapeRegExpChars from "./escapeRegExpChars";
+import getChangeLogPath from "./getChangeLogPath";
 
 import getFSPath from "./getFSPath";
 
 export default function setChange(
     description: string, done: boolean = false
 ) {
-    const path = getFSPath("ROADMAP.md");
+    const path = getChangeLogPath(true);
     if (!path) {
         return;
     }
-    if (!existsSync(path)) {
-        writeFileSync(path, "# ROADMAP\n\n");
-    }
+    const content = readFileSync(path).toString();
+    
+    const unreleasedEndIndex = (
+        content.match(/\r?\n##\s+\[(\d+).(\d+).(\d+)\]/)?.index ||
+        content.length - 1
+    );
+    const unreleasedMatch = content.match(/^\s*##\s+\[unreleased\]/im);
+    const unreleasedStartIndex = (
+        unreleasedMatch?.index! ?? unreleasedEndIndex
+    );
+    
+    const unreleasedLength = unreleasedEndIndex - unreleasedStartIndex;
     const line = `[${ done ? "x" : " "}] ${description}`;
 
     let replaced = false;
-    const content = readFileSync(path).toString().replace(new RegExp(
-        `^\\s*\\[[ x]\\]\\s+${escapeRegExpChars(description)}\\s*$`,
-        "m"
-    ), () => {
+    const unreleasedContent = content.substr(
+        unreleasedStartIndex,
+        unreleasedLength
+    ).replace(new RegExp(
+        `\\n[^\\S\\n]*\\[[ x]\\]\\s+${escapeRegExpChars(description)}(\\r?)\\n`
+    ), (...match) => {
         replaced = true;
-        return line;
+        return `\n${line}${match[1]}\n`;
     });
-    writeFileSync(path, content + (replaced ? "" : `\n${line}`));
+
+    writeFileSync(path, `${
+        content.substr(0, unreleasedStartIndex)
+    }${
+        replaced ? unreleasedContent : unreleasedContent.replace(
+            /(\r?\n)*$/,
+            match => {
+                return "\n" + line + match;
+            }
+        )
+    }${
+        content.substr(unreleasedEndIndex)
+    }`);
 }

@@ -1,26 +1,32 @@
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import escapeRegExpChars from "./escapeRegExpChars";
+import getChangeLogPath from "./getChangeLogPath";
 
 import getFSPath from "./getFSPath";
 
 export default function removeChangesFromRoadmap(
     changes: string[], done: boolean = false
 ) {
-    const path = getFSPath("ROADMAP.md");
-    if (!path || !existsSync(path)) {
+    const path = getChangeLogPath();
+    if (!path) {
         return;
     }
     const content = readFileSync(path).toString();
-    const lines = content.match(new RegExp(
-        `^\\s*\\[[ x]\\]\\s*(?:${
-            changes.map(escapeRegExpChars).join("|")
-        })\\s*$`,
-        "gm"
-    ));
-    if (!lines) {
+    const unreleasedMatch = content.match(/^\s*##\s+\[unreleased\]/im);
+    if (!unreleasedMatch) {
         return;
     }
-    writeFileSync(path, content.replace(new RegExp(
-        `\\r?\\n(?:${lines.map(escapeRegExpChars).join("|")})`, "g"
-    ), ""));
+    const unreleasedStartIndex = unreleasedMatch.index!;
+    const unreleasedEndIndex = (
+        content.match(/\r?\n##\s+\[(\d+).(\d+).(\d+)\]/)?.index ||
+        content.length - 1
+    );
+
+    writeFileSync(path, `${
+        content.substr(0, unreleasedStartIndex)
+    }${
+        unreleasedMatch[0]
+    }\n${
+        content.substr(unreleasedEndIndex)
+    }`);
 }
