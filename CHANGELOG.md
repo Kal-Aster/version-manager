@@ -7,6 +7,12 @@ All notable changes to the "version-manager" extension will be documented in thi
 [ ] Make new version undoable
 [ ] Make change entries editable
 
+## [0.3.2] - 23/11/2021
+- Fix bug removing changes from unreleased
+- Fix extra new line in CHANGELOG after new version
+- Fix drag handle and remove icon
+- Update dependencies
+
 ## [0.3.1] - 23/11/2021
 - Fix not done changes removed on new version
 - Fix drag handle

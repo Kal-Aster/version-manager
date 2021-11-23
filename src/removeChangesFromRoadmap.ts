@@ -29,11 +29,11 @@ export default function removeChangesFromRoadmap(changes: string[]) {
         content.substr(0, unreleasedStartIndex)
     }${
         unreleasedContent.replace(new RegExp(
-            `\\n[^\\S\\n]*\\[[ x]\\]\\s+(${
-                changes.map((change) => `(${escapeRegExpChars(change)}`).join("|")
-            })[^\\S\\n]*\\r?\\n`
-        ), "\n")
-    }\n${
+            `^[^\\S\\n]*\\[[ x]\\]\\s+(${
+                changes.map((change) => `(${escapeRegExpChars(change)})`).join("|")
+            })[^\\S\\n]*\\n`, "gm"
+        ), "")
+    }${
         content.substr(unreleasedEndIndex)
     }`);
 }

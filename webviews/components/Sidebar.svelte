@@ -206,6 +206,7 @@
                         padding: 4px 0px;
                         cursor: pointer;
                         display: flex;
+                        flex-shrink: 0;
                     "
                     on:mousedown={startDrag}
                 >
@@ -243,7 +244,7 @@
                     >{change.description}</span>
                 </label>
                 <div
-                    style="cursor: pointer;"
+                    style="cursor: pointer; align-self: start;"
                     on:click={() => removeChange(change.description)}
                 >✕</div>
             </div>
