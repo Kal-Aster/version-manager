@@ -206,7 +206,6 @@
                         padding: 4px 0px;
                         cursor: pointer;
                         display: flex;
-                        align-items: center;
                     "
                     on:mousedown={startDrag}
                 >
@@ -218,6 +217,7 @@
                             border-color: var(--vscode-icon-foreground);
                             border-width: 2px 0;
                             width: 100%;
+                            margin-top: 2px;
                         "
                     ></div>
                 </div>

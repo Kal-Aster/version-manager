@@ -30,9 +30,7 @@ export default function removeChange(description: string) {
     }${
         unreleasedContent.replace(new RegExp(
             `\\n[^\\S\\n]*\\[[ x]\\]\\s+${escapeRegExpChars(description)}[^\\S\\n]*\\r?\\n`
-        ), () => {
-            return "\n";
-        })
+        ), "\n")
     }${
         content.substr(unreleasedEndIndex)
     }`);

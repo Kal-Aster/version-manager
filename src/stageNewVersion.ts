@@ -31,7 +31,7 @@ export default function stageNewVersion(type: NEW_VERSION_TYPE) {
     }
     
     const changes = getChanges(true).map(({ description }) => description);
-    removeChangesFromRoadmap(changes, true);
+    removeChangesFromRoadmap(changes);
     addChangelogEntry(version, changes);
 
     updateVersionInPackageJSON(version);

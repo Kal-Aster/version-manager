@@ -3,6 +3,13 @@
 All notable changes to the "version-manager" extension will be documented in this file.
 
 ## [Unreleased]
+[ ] Add paynal deploy button
+[ ] Make new version undoable
+[ ] Make change entries editable
+
+## [0.3.1] - 23/11/2021
+- Fix not done changes removed on new version
+- Fix drag handle
 
 ## [0.3.0] - 23/11/2021
 - Make changes sortable

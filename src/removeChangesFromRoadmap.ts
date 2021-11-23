@@ -4,9 +4,7 @@ import getChangeLogPath from "./getChangeLogPath";
 
 import getFSPath from "./getFSPath";
 
-export default function removeChangesFromRoadmap(
-    changes: string[], done: boolean = false
-) {
+export default function removeChangesFromRoadmap(changes: string[]) {
     const path = getChangeLogPath();
     if (!path) {
         return;
@@ -21,11 +19,20 @@ export default function removeChangesFromRoadmap(
         content.match(/\r?\n##\s+\[(\d+).(\d+).(\d+)\]/)?.index ||
         content.length - 1
     );
+    const unreleasedLength = unreleasedEndIndex - unreleasedStartIndex;
+    const unreleasedContent = content.substr(
+        unreleasedStartIndex,
+        unreleasedLength
+    );
 
     writeFileSync(path, `${
         content.substr(0, unreleasedStartIndex)
     }${
-        unreleasedMatch[0]
+        unreleasedContent.replace(new RegExp(
+            `\\n[^\\S\\n]*\\[[ x]\\]\\s+(${
+                changes.map((change) => `(${escapeRegExpChars(change)}`).join("|")
+            })[^\\S\\n]*\\r?\\n`
+        ), "\n")
     }\n${
         content.substr(unreleasedEndIndex)
     }`);
