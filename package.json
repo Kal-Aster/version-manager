@@ -2,7 +2,7 @@
   "name": "version-manager",
   "displayName": "Version manager",
   "description": "This vscode extension allow defining changes and manage versioning",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "engines": {
     "vscode": "^1.52.0"
   },

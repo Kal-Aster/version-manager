@@ -2,6 +2,14 @@
 
 All notable changes to the "version-manager" extension will be documented in this file.
 
+## [Unreleased]
+
+## [0.3.0] - 23/11/2021
+- Make changes sortable
+- Add webview bottom padding
+- Fix version increment
+- Fix removeChange function
+
 ## [0.2.2] - 22/11/2021
 - Move add change input on top
 - Use "Unreleased" version in CHANGELOG instead ROADMAP file

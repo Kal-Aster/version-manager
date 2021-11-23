@@ -14,10 +14,13 @@ export default function stageNewVersion(type: NEW_VERSION_TYPE) {
     switch (type) {
         case NEW_VERSION_TYPE.MAJOR: {
             version.major++;
+            version.minor = 0;
+            version.patch = 0;
             break;
-        }
-        case NEW_VERSION_TYPE.MINOR: {
+          }
+          case NEW_VERSION_TYPE.MINOR: {
             version.minor++;
+            version.patch = 0;
             break;
         }
         case NEW_VERSION_TYPE.PATCH: {

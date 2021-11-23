@@ -3,6 +3,7 @@ import getChanges from "./getChanges";
 
 import getNonce from "./getNonce";
 import getVersion from "./getVersion";
+import moveChange from "./moveChange";
 import NEW_VERSION_TYPE from "./NEW_VERSION_TYPE";
 import removeChange from "./removeChange";
 import setChange from "./setChange";
@@ -56,6 +57,15 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                 }
                 case "set-change": {
                     setChange(data.value.description, data.value.done);
+                    webviewView.webview.postMessage({
+                        type: "changes",
+                        value: getChanges()
+                    });
+                    break;
+                }
+                case "move-change": {
+                    const { fromIndex, toIndex } = data.value;
+                    moveChange(fromIndex, toIndex);
                     webviewView.webview.postMessage({
                         type: "changes",
                         value: getChanges()

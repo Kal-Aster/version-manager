@@ -1,10 +1,12 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { onMount, beforeUpdate } from "svelte";
 
-    let changes: {
+    interface IChange {
         description: string,
         done: boolean
-    }[] = [];
+    }
+
+    let changes: IChange[] = [];
     let version: {
         major: number,
         minor: number,
@@ -12,7 +14,11 @@
     };
     let changesLoading: boolean = true;
     let versionLoading: boolean = true;
-    
+
+    let changesContainerElement: HTMLElement;
+
+    let isDragging = false;
+
     onMount(async () => {
         window.addEventListener("message", async (event) => {
             const message = event.data;
@@ -32,11 +38,102 @@
         vscode.postMessage({ type: "get-info", value: undefined });
     });
 
+    beforeUpdate(resetTransform);
+
+    function removeChange(value: string) {
+        vscode.postMessage({ type: "rem-change", value });
+    }
+
+    function resetTransform() {
+        if (!changesContainerElement) {
+            return;
+        }
+        Array.prototype.forEach.call(changesContainerElement.children, child => {
+            child.style.transform = "";
+        });
+    }
+
     function setChange(description: string, done: boolean) {
         vscode.postMessage({ type: "set-change", value: {
             description,
             done
         } });
+    }
+
+    function startDrag(event: MouseEvent) {
+        event.preventDefault();
+
+        isDragging = true;
+
+        const target = (event.currentTarget as HTMLElement).parentElement!;
+        const parent = target.parentElement!;
+        const fromIndex = [...parent.children].indexOf(target);
+
+        let toIndex = fromIndex;
+        const onmousemove = (event: MouseEvent) => {
+            event.preventDefault();
+            resetTransform();
+            
+            const mouseY = event.clientY;
+            
+            if (!Array.prototype.some.call(parent.children, (child: HTMLElement, index) => {
+                const rect = child.getBoundingClientRect();
+                if (
+                    index === 0 &&
+                    mouseY < rect.y
+                ) {
+                    toIndex = index;
+                    return true;
+                }
+                if (
+                    mouseY < rect.y ||
+                    mouseY > rect.y + rect.height
+                ) {
+                    return false;
+                }
+
+                toIndex = index;
+                return true;
+            })) {
+                toIndex = parent.children.length - 1;
+            }
+                
+            if (toIndex === fromIndex) {
+                return;
+            }
+            
+            const draggedElementHeight = parent.children[fromIndex].getBoundingClientRect().height;
+            const reverse = toIndex < fromIndex;
+            let draggedElementTranslateY = 0;
+            Array.prototype.slice.call(
+                parent.children,
+                (reverse ? toIndex   : fromIndex + 1),
+                (reverse ? fromIndex : toIndex   + 1)
+            ).forEach(child => {
+                child.style.transform = `translateY(${
+                    draggedElementHeight * (reverse ? 1 : -1)
+                }px)`;
+                draggedElementTranslateY += child.getBoundingClientRect().height;
+            });
+            (parent.children[fromIndex] as HTMLElement).style.transform = `translateY(${
+                draggedElementTranslateY * (reverse ? -1 : 1)
+            }px)`;
+        };
+        const onmouseup = (event: MouseEvent) => {
+            event.preventDefault();
+
+            window.removeEventListener("mousemove", onmousemove);
+            window.removeEventListener("mouseup", onmouseup);
+
+            if (fromIndex === toIndex) {
+                return;
+            }
+            
+            vscode.postMessage({ type: "move-change", value: { fromIndex, toIndex } });
+        }
+        window.addEventListener("mousemove", onmousemove);
+        window.addEventListener("mouseup", onmouseup);
+        
     }
 
     function submitChange(event: any) {
@@ -48,10 +145,6 @@
         setChange(description, done);
         event.target.elements.description.value = "";
         event.target.elements.done.checked = false;
-    }
-
-    function removeChange(value: string) {
-        vscode.postMessage({ type: "rem-change", value });
     }
 </script>
 
@@ -102,23 +195,58 @@
             "
         >Add</button>
     </form>
-    {#each changes as change}
-        <div style="display: flex; align-items: center;">
-            <label style="display: flex; flex-grow: 1;">
-                <input
-                    type="checkbox"
-                    checked={change.done}
-                    on:change={() => setChange(change.description, !change.done)}
-                    style="vertical-align: middle;"
+    <div style="padding-bottom: 24px;" bind:this={changesContainerElement}>
+        {#each changes as change}
+            <div style="display: flex; align-items: center;">
+                <div
+                    style="
+                        width: 12px;
+                        align-self: stretch;
+                        margin-right: 4px;
+                        padding: 4px 0px;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                    "
+                    on:mousedown={startDrag}
                 >
-                <span
-                    style="vertical-align: middle;"
-                >{change.description}</span>
-            </label>
-            <div
-                style="cursor: pointer;"
-                on:click={() => removeChange(change.description)}
-            >✕</div>
-        </div>
-    {/each}
+                    <div
+                        style="
+                            box-sizing: content-box;
+                            height: 2px;
+                            border-style: solid;
+                            border-color: var(--vscode-icon-foreground);
+                            border-width: 2px 0;
+                            width: 100%;
+                        "
+                    ></div>
+                </div>
+                <label
+                    style="display: flex; flex-grow: 1;"
+                    on:click={() => {
+                        if (!isDragging) {
+                            return;
+                        }
+                        isDragging = false;
+                    }}
+                >
+                    <input
+                        type="checkbox"
+                        checked={change.done}
+                        on:change={() => {
+                            setChange(change.description, !change.done);
+                        }}
+                        style="vertical-align: middle;"
+                    >
+                    <span
+                        style="vertical-align: middle;"
+                    >{change.description}</span>
+                </label>
+                <div
+                    style="cursor: pointer;"
+                    on:click={() => removeChange(change.description)}
+                >✕</div>
+            </div>
+        {/each}
+    </div>
 {/if}
