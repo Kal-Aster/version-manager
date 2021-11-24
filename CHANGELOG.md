@@ -4,8 +4,12 @@ All notable changes to the "version-manager" extension will be documented in thi
 
 ## [Unreleased]
 [ ] Add paynal deploy button
-[ ] Make new version undoable
-[ ] Make change entries editable
+
+## [0.4.0] - 24/11/2021
+- Make new version undoable
+- Make change entries editable
+- Use codicons
+- Clean code
 
 ## [0.3.2] - 23/11/2021
 - Fix bug removing changes from unreleased

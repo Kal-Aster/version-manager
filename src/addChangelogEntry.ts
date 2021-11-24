@@ -1,6 +1,6 @@
-import { existsSync, readFileSync, writeFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
+
 import getChangeLogPath from "./getChangeLogPath";
-import getFSPath from "./getFSPath";
 import getLegibleCurrentDate from "./getLegibleCurrentDate";
 import IVersion from "./IVersion";
 

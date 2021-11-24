@@ -1,8 +1,7 @@
-import { existsSync, readFileSync, writeFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
+
 import escapeRegExpChars from "./escapeRegExpChars";
 import getChangeLogPath from "./getChangeLogPath";
-
-import getFSPath from "./getFSPath";
 
 export default function removeChangesFromRoadmap(changes: string[]) {
     const path = getChangeLogPath();

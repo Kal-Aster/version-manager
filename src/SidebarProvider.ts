@@ -1,11 +1,13 @@
 import * as vscode from "vscode";
-import getChanges from "./getChanges";
+import editChange from "./editChange";
 
+import getChanges from "./getChanges";
 import getNonce from "./getNonce";
 import getVersion from "./getVersion";
 import moveChange from "./moveChange";
 import NEW_VERSION_TYPE from "./NEW_VERSION_TYPE";
 import removeChange from "./removeChange";
+import revertLastVersion from "./revertLastVersion";
 import setChange from "./setChange";
 import stageNewVersion from "./stageNewVersion";
 
@@ -55,6 +57,18 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                     });
                     break;
                 }
+                case "revert-last-version": {
+                    revertLastVersion();
+                    webviewView.webview.postMessage({
+                        type: "changes",
+                        value: getChanges()
+                    });
+                    webviewView.webview.postMessage({
+                        type: "version",
+                        value: getVersion()
+                    });
+                    break;
+                }
                 case "set-change": {
                     setChange(data.value.description, data.value.done);
                     webviewView.webview.postMessage({
@@ -66,6 +80,15 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                 case "move-change": {
                     const { fromIndex, toIndex } = data.value;
                     moveChange(fromIndex, toIndex);
+                    webviewView.webview.postMessage({
+                        type: "changes",
+                        value: getChanges()
+                    });
+                    break;
+                }
+                case "edit-change": {
+                    const { from, to } = data.value;
+                    editChange(from, to);
                     webviewView.webview.postMessage({
                         type: "changes",
                         value: getChanges()
@@ -115,6 +138,12 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         const styleVSCodeUri = webview.asWebviewUri(
             vscode.Uri.joinPath(this._extensionUri, "media", "vscode.css")
         );
+		const codiconsUri = webview.asWebviewUri(
+            vscode.Uri.joinPath(
+                this._extensionUri,
+                "node_modules", "@vscode/codicons", "dist", "codicon.css"
+            )
+        );
 
         const scriptUri = webview.asWebviewUri(
             vscode.Uri.joinPath(this._extensionUri, "out", "compiled/sidebar.js")
@@ -136,11 +165,14 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                 -->
                 <meta http-equiv="Content-Security-Policy" content="img-src https: data:; style-src 'unsafe-inline' ${
                     webview.cspSource
+                }; font-src: ${
+                    webview.cspSource
                 }; script-src 'nonce-${nonce}';">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <link href="${styleResetUri}" rel="stylesheet">
                 <link href="${styleVSCodeUri}" rel="stylesheet">
                 <link href="${styleMainUri}" rel="stylesheet">
+				<link href="${codiconsUri}" rel="stylesheet" />
                 <script nonce="${nonce}">
                     const vscode = acquireVsCodeApi();
                 </script>

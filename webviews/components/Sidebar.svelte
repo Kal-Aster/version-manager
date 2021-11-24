@@ -133,7 +133,61 @@
         }
         window.addEventListener("mousemove", onmousemove);
         window.addEventListener("mouseup", onmouseup);
-        
+    }
+
+    function startEdit(event: MouseEvent) {
+        const entryLabel = (
+            event.currentTarget as HTMLElement
+        ).parentElement!.querySelector("label > span") as HTMLSpanElement;
+        const from = entryLabel.innerText.replace(/^\s*|\s*$/g, "");
+
+        const onblur = () => {
+            removeEventListeners();
+            entryLabel.contentEditable = "inherit";
+
+            const to = entryLabel.innerText.replace(/^\s*|\s*$/g, "");
+            if (to === "" || to === from) {
+                entryLabel.innerText = from;
+                return;
+            }
+            
+            vscode.postMessage({ type: "edit-change", value: { from, to } });
+        };
+        const onbeforeinput = (event: Event) => {
+            const { inputType } = event as InputEvent;
+            if (inputType !== "insertParagraph") {
+                return;
+            }
+            event.preventDefault();
+            (event.currentTarget as HTMLSpanElement).blur();
+        };
+        const onkeydown = (event: KeyboardEvent) => {
+            if (event.key !== "Escape") {
+                return;
+            }
+            removeEventListeners();
+            entryLabel.contentEditable = "inherit";
+            entryLabel.innerText = from;
+        };
+
+        const removeEventListeners = () => {
+            entryLabel.removeEventListener("blur", onblur);
+            entryLabel.removeEventListener("beforeinput", onbeforeinput);
+            entryLabel.removeEventListener("keydown", onkeydown);
+        };
+        entryLabel.addEventListener("blur", onblur);
+        entryLabel.addEventListener("beforeinput", onbeforeinput);
+        entryLabel.addEventListener("keydown", onkeydown);
+
+        entryLabel.contentEditable = "true";
+        entryLabel.focus();
+
+        const sel = window.getSelection();
+
+        if (sel) {
+            sel.selectAllChildren(entryLabel);
+            sel.collapseToEnd();
+        }
     }
 
     function submitChange(event: any) {
@@ -176,6 +230,9 @@
             changes.filter(change => change.done).length > 0 ? "↑" : ""
         ) }</button>
     </div>
+    <button on:click={() => {
+        vscode.postMessage({ type: "revert-last-version", value: "" });
+    }}>revert</button>
     <form
         on:submit={submitChange}
         style="margin: 12px 0 24px; display: flex; align-items: center;"
@@ -198,37 +255,28 @@
     <div style="padding-bottom: 24px;" bind:this={changesContainerElement}>
         {#each changes as change}
             <div style="display: flex; align-items: center;">
-                <div
+                <i
+                    class="codicon codicon-gripper"
                     style="
-                        width: 12px;
-                        align-self: stretch;
-                        margin-right: 4px;
-                        padding: 4px 0px;
+                        margin-left: -5px;
+                        margin-top: 1px;
+                        align-self: start;
                         cursor: pointer;
-                        display: flex;
-                        flex-shrink: 0;
                     "
                     on:mousedown={startDrag}
-                >
-                    <div
-                        style="
-                            box-sizing: content-box;
-                            height: 2px;
-                            border-style: solid;
-                            border-color: var(--vscode-icon-foreground);
-                            border-width: 2px 0;
-                            width: 100%;
-                            margin-top: 2px;
-                        "
-                    ></div>
-                </div>
+                ></i>
                 <label
                     style="display: flex; flex-grow: 1;"
-                    on:click={() => {
-                        if (!isDragging) {
+                    on:mousedown={(event) => {
+                        const span = event.currentTarget.querySelector("span");
+                        if (
+                            !span ||
+                            event.target !== span ||
+                            span.contentEditable !== "true"
+                        ) {
                             return;
                         }
-                        isDragging = false;
+                        event.preventDefault();
                     }}
                 >
                     <input
@@ -240,13 +288,19 @@
                         style="vertical-align: middle;"
                     >
                     <span
-                        style="vertical-align: middle;"
+                        style="vertical-align: middle; padding-right: 4px;"
                     >{change.description}</span>
                 </label>
-                <div
+                <i
+                    class="codicon codicon-edit"
+                    style="cursor: pointer; align-self: start;"
+                    on:click={startEdit}
+                ></i>
+                <i
+                    class="codicon codicon-close"
                     style="cursor: pointer; align-self: start;"
                     on:click={() => removeChange(change.description)}
-                >✕</div>
+                ></i>
             </div>
         {/each}
     </div>

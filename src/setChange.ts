@@ -1,8 +1,7 @@
-import { existsSync, readFileSync, writeFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
+
 import escapeRegExpChars from "./escapeRegExpChars";
 import getChangeLogPath from "./getChangeLogPath";
-
-import getFSPath from "./getFSPath";
 
 export default function setChange(
     description: string, done: boolean = false
@@ -41,9 +40,7 @@ export default function setChange(
     }${
         replaced ? unreleasedContent : unreleasedContent.replace(
             /(\r?\n)*$/,
-            match => {
-                return "\n" + line + match;
-            }
+            match => `\n${line}${match}`
         )
     }${
         content.substr(unreleasedEndIndex)

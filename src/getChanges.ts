@@ -1,4 +1,5 @@
 import { readFileSync } from "fs";
+
 import getChangeLogPath from "./getChangeLogPath";
 
 const allRegex = /^\[[ x]\](.*)$/gm;

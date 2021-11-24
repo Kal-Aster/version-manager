@@ -36,7 +36,7 @@ export default function getVersion(): IVersion {
     }
     const content = readFileSync(changelogPath).toString();
     const [major, minor, patch] = (
-        content.match(/\r?\n\r?\n##\s+\[(\d+).(\d+).(\d+)\]/)?.slice(1).map(n => parseInt(n, 10))
+        content.match(/\r?\n##\s+\[(\d+).(\d+).(\d+)\]/)?.slice(1).map(n => parseInt(n, 10))
     ) || [];
     if (major === undefined) {
         return getVersionFromPackageJSON();

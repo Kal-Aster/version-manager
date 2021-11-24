@@ -1,4 +1,5 @@
 import { existsSync, writeFileSync } from "fs";
+
 import getFSPath from "./getFSPath";
 
 export default function getChangeLogPath(force: boolean = false) {
