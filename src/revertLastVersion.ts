@@ -7,7 +7,13 @@ import getChangeLogPath from "./getChangeLogPath";
 import IVersion from "./IVersion";
 import updateVersionInPackageJSON from "./updateVersionInPackageJSON";
 
-export default function revertLastVersion() {
+export default async function revertLastVersion() {
+    if (await vscode.window.showInformationMessage(
+        "Do you really want to revert to previous version?",
+        "Yes", "No"
+    ) === "No") {
+        return;
+    }
     const path = getChangeLogPath();
     if (!path) {
         return;

@@ -5,6 +5,13 @@ All notable changes to the "version-manager" extension will be documented in thi
 ## [Unreleased]
 [ ] Add paynal deploy button
 
+## [0.4.1] - 24/11/2021
+- Actually include codicons in package
+- Edit revert button
+- Ask confirm when reverting version
+- Include license
+- Set repository in package.json
+
 ## [0.4.0] - 24/11/2021
 - Make new version undoable
 - Make change entries editable

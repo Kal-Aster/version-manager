@@ -229,10 +229,14 @@
         }}>{ version.patch + (
             changes.filter(change => change.done).length > 0 ? "↑" : ""
         ) }</button>
+        <i
+            class="codicon codicon-discard"
+            style="margin-left: 4px; cursor: pointer;"
+            on:click={() => {
+                vscode.postMessage({ type: "revert-last-version", value: "" });
+            }}
+        ></i>
     </div>
-    <button on:click={() => {
-        vscode.postMessage({ type: "revert-last-version", value: "" });
-    }}>revert</button>
     <form
         on:submit={submitChange}
         style="margin: 12px 0 24px; display: flex; align-items: center;"

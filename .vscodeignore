@@ -1,6 +1,8 @@
 .vscode/**
 build/**
 node_modules/**
+!node_modules/@vscode/codicons/dist/codicon.css
+!node_modules/@vscode/codicons/dist/codicon.ttf
 webviews/**
 src/**
 .gitignore
