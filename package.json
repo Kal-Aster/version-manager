@@ -2,7 +2,7 @@
   "name": "version-manager",
   "displayName": "Version manager",
   "description": "This vscode extension allow defining changes and manage versioning",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "repository": {
     "url": "https://github.com/Kal-Aster/version-manager"
   },

@@ -5,7 +5,7 @@ import { readFileSync, writeFileSync } from "fs";
 import escapeRegExpChars from "./escapeRegExpChars";
 import getChangeLogPath from "./getChangeLogPath";
 import IVersion from "./IVersion";
-import updateVersionInPackageJSON from "./updateVersionInPackageJSON";
+import updateVersionInPackageManagerConfigFiles from "./updateVersionInPackageManagerConfigFiles";
 
 export default async function revertLastVersion() {
     if (await vscode.window.showInformationMessage(
@@ -78,5 +78,5 @@ export default async function revertLastVersion() {
         minor: parseInt(second[2], 10),
         patch: parseInt(second[3], 10)
     };
-    updateVersionInPackageJSON(version);
+    updateVersionInPackageManagerConfigFiles(version);
 }

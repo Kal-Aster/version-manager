@@ -5,6 +5,9 @@ All notable changes to the "version-manager" extension will be documented in thi
 ## [Unreleased]
 [ ] Add paynal deploy button
 
+## [0.5.0] - 04/01/2022
+- Add support for other package manager than npm
+
 ## [0.4.2] - 04/01/2022
 - Fix unreleased header not added
 - Fix change removed when dialog dismissed without answer

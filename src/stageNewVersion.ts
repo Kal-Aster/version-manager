@@ -7,7 +7,7 @@ import getChanges from "./getChanges";
 import getVersion from "./getVersion";
 import NEW_VERSION_TYPE from "./NEW_VERSION_TYPE";
 import removeChangesFromRoadmap from "./removeChangesFromRoadmap";
-import updateVersionInPackageJSON from "./updateVersionInPackageJSON";
+import updateVersionInPackageManagerConfigFiles from "./updateVersionInPackageManagerConfigFiles";
 
 export default function stageNewVersion(type: NEW_VERSION_TYPE) {
     const version = getVersion();
@@ -34,7 +34,7 @@ export default function stageNewVersion(type: NEW_VERSION_TYPE) {
     removeChangesFromRoadmap(changes);
     addChangelogEntry(version, changes);
 
-    updateVersionInPackageJSON(version);
+    updateVersionInPackageManagerConfigFiles(version);
 
     const gitExtension = vscode.extensions.getExtension<GitExtension>('vscode.git')?.exports;
     if (!gitExtension) {
