@@ -19,6 +19,8 @@
 
     let isDragging = false;
 
+    let vscode_obj = vscode;
+
     onMount(async () => {
         window.addEventListener("message", async (event) => {
             const message = event.data;
@@ -35,13 +37,13 @@
                 }
             }
         });
-        vscode.postMessage({ type: "get-info", value: undefined });
+        vscode_obj.postMessage({ type: "get-info", value: undefined });
     });
 
     beforeUpdate(resetTransform);
 
     function removeChange(value: string) {
-        vscode.postMessage({ type: "rem-change", value });
+        vscode_obj.postMessage({ type: "rem-change", value });
     }
 
     function resetTransform() {
@@ -54,7 +56,7 @@
     }
 
     function setChange(description: string, done: boolean) {
-        vscode.postMessage({ type: "set-change", value: {
+        vscode_obj.postMessage({ type: "set-change", value: {
             description,
             done
         } });
@@ -129,7 +131,7 @@
                 return;
             }
             
-            vscode.postMessage({ type: "move-change", value: { fromIndex, toIndex } });
+            vscode_obj.postMessage({ type: "move-change", value: { fromIndex, toIndex } });
         }
         window.addEventListener("mousemove", onmousemove);
         window.addEventListener("mouseup", onmouseup);
@@ -151,7 +153,7 @@
                 return;
             }
             
-            vscode.postMessage({ type: "edit-change", value: { from, to } });
+            vscode_obj.postMessage({ type: "edit-change", value: { from, to } });
         };
         const onbeforeinput = (event: Event) => {
             const { inputType } = event as InputEvent;
@@ -215,17 +217,17 @@
     <div style="display: flex; align-items: center;">
         <div style="margin-right: 8px;">Version:</div>
         <button on:click={() => {
-            vscode.postMessage({ type: "stage-new-major-version", value: "" });
+            vscode_obj.postMessage({ type: "stage-new-major-version", value: "" });
         }}>{ version.major + (
             changes.filter(change => change.done).length > 0 ? "↑" : ""
         ) }</button>
         <button on:click={() => {
-            vscode.postMessage({ type: "stage-new-minor-version", value: "" });
+            vscode_obj.postMessage({ type: "stage-new-minor-version", value: "" });
         }}>{ version.minor + (
             changes.filter(change => change.done).length > 0 ? "↑" : ""
         ) }</button>
         <button on:click={() => {
-            vscode.postMessage({ type: "stage-new-patch-version", value: "" });
+            vscode_obj.postMessage({ type: "stage-new-patch-version", value: "" });
         }}>{ version.patch + (
             changes.filter(change => change.done).length > 0 ? "↑" : ""
         ) }</button>
@@ -233,7 +235,7 @@
             class="codicon codicon-discard"
             style="margin-left: 4px; cursor: pointer;"
             on:click={() => {
-                vscode.postMessage({ type: "revert-last-version", value: "" });
+                vscode_obj.postMessage({ type: "revert-last-version", value: "" });
             }}
         ></i>
     </div>

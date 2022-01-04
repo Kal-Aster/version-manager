@@ -20,14 +20,13 @@ export default function setChange(
     const unreleasedStartIndex = (
         unreleasedMatch?.index! ?? unreleasedEndIndex
     );
-    
-    const unreleasedLength = unreleasedEndIndex - unreleasedStartIndex;
+
     const line = `[${ done ? "x" : " "}] ${description}`;
 
     let replaced = false;
-    const unreleasedContent = content.substr(
+    const unreleasedContent = content.substring(
         unreleasedStartIndex,
-        unreleasedLength
+        unreleasedEndIndex
     ).replace(new RegExp(
         `\\n[^\\S\\n]*\\[[ x]\\]\\s+${escapeRegExpChars(description)}(\\r?)\\n`
     ), (...match) => {
@@ -35,14 +34,25 @@ export default function setChange(
         return `\n${line}${match[1]}\n`;
     });
 
+    console.log("Setting change", {
+        description, done,
+        unreleasedStartIndex,
+        unreleasedEndIndex,
+        unreleasedContent
+    });
+
     writeFileSync(path, `${
-        content.substr(0, unreleasedStartIndex)
+        content.substring(0, unreleasedStartIndex)
+    }${
+        unreleasedStartIndex === unreleasedEndIndex ? "\n## [Unreleased]" : ""
     }${
         replaced ? unreleasedContent : unreleasedContent.replace(
             /(\r?\n)*$/,
             match => `\n${line}${match}`
         )
     }${
-        content.substr(unreleasedEndIndex)
+        unreleasedStartIndex === unreleasedEndIndex ? "\n" : ""
+    }${
+        content.substring(unreleasedEndIndex)
     }`);
 }

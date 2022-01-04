@@ -5,6 +5,10 @@ All notable changes to the "version-manager" extension will be documented in thi
 ## [Unreleased]
 [ ] Add paynal deploy button
 
+## [0.4.2] - 04/01/2022
+- Fix unreleased header not added
+- Fix change removed when dialog dismissed without answer
+
 ## [0.4.1] - 24/11/2021
 - Actually include codicons in package
 - Edit revert button

@@ -99,7 +99,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                     if ((await vscode.window.showInformationMessage(
                         `Want to delete this change? (${data.value})`,
                         "Yes", "No"
-                    )) === "No") {
+                    )) !== "Yes") {
                         break;
                     }
                     removeChange(data.value);
